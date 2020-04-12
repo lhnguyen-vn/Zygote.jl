@@ -44,7 +44,7 @@ _zero(xs::AbstractArray, T=Any) = Union{Nothing, T}[nothing for x in xs]
   else
     dx = _zero(x, eltype(dy))
     dxv = view(dx, inds...)
-    dxv .+= _droplike(dy, dxv)
+    dxv .= _droplike(dy, dxv)
   end
   (dx, map(_->nothing, inds)...)
 end
@@ -834,11 +834,11 @@ end
 end
 
 
-# to actually use rfft, one needs to insure that everything 
-# that happens in the Fourier domain could've been done in 
-# the space domain with real numbers. This means enforcing 
-# conjugate symmetry along all transformed dimensions besides 
-# the first. Otherwise this is going to result in *very* weird 
+# to actually use rfft, one needs to insure that everything
+# that happens in the Fourier domain could've been done in
+# the space domain with real numbers. This means enforcing
+# conjugate symmetry along all transformed dimensions besides
+# the first. Otherwise this is going to result in *very* weird
 # behavior.
 @adjoint function rfft(xs::AbstractArray{<:Real})
   return AbstractFFTs.rfft(xs), function(Δ)
