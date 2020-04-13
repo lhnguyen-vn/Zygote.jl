@@ -31,6 +31,7 @@ end
 @adjoint (::Type{T})(sz) where {T<:Ones} = T(sz), Δ->(nothing,)
 
 _zero(xs::AbstractArray{<:Number}, T=float(eltype(xs))) = fill!(similar(xs, T), false)
+_zero(xs::AbstractArray{<:AbstractArray}, T=Any) = [_zero(x) for x in xs]
 _zero(xs::AbstractArray, T=Any) = Union{Nothing, T}[nothing for x in xs]
 
 @adjoint getindex(x::AbstractArray, inds...) = x[inds...], ∇getindex(x, inds)
@@ -44,7 +45,7 @@ _zero(xs::AbstractArray, T=Any) = Union{Nothing, T}[nothing for x in xs]
   else
     dx = _zero(x, eltype(dy))
     dxv = view(dx, inds...)
-    dxv .= _droplike(dy, dxv)
+    dxv .+= _droplike(dy, dxv)
   end
   (dx, map(_->nothing, inds)...)
 end
